@@ -3,7 +3,7 @@ const Canvas = require("canvas");
 module.exports = class Welcome2 {
 
     constructor() {
-        this.fm = "https://i.ibb.co/zmFq2St/20210818-120037.png";
+        this.fm = "https://k.top4top.io/p_3604d1kx31.png";
         this.bg = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRAJUlAjJvRP_n-rV7mmb6Xf3-Zutfy8agig&usqp=CAU";
         this.avatar = "https://i.ibb.co/G5mJZxs/rin.jpg";
         this.username = "Lenz-cmd";
@@ -85,3 +85,4 @@ module.exports = class Welcome2 {
         return canvas;
     }
 };
+
