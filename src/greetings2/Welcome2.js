@@ -5,11 +5,11 @@ module.exports = class Welcome2 {
 
     constructor() {
         this.fm = "https://k.top4top.io/p_3604d1kx31.png";
-        this.bg = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRAJUlAjJvRP_n-rV7mmb6Xf3-Zutfy8agig&usqp=CAU";
-        this.avatar = "https://i.ibb.co/G5mJZxs/rin.jpg";
-        this.username = "Lenz-cmd";
-        this.grupname = "SQUAD-404";
-        this.member = "404";
+        this.bg = "https://files.cloudkuimages.guru/images/b21475ec2285.jpg";
+        this.avatar = "https://files.cloudkuimages.guru/images/e7bccdc4da98.jpg";
+        this.username = "Corazon - Oota";
+        this.grupname = "Kashiwada Bot";
+        this.member = "500";
     }
 
     // setter methods
@@ -80,3 +80,4 @@ module.exports = class Welcome2 {
         return canvas;
     }
 }
+
