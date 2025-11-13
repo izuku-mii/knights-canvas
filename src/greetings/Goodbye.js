@@ -6,6 +6,7 @@ module.exports = class Goodbye extends Greeting {
         this.textTitle = "GOODBYE";
         this.textMessage = "{server}";
         this.colorTitle = "#df0909";
-        this.assent = "https://i.ibb.co/d7xkSg3/goodbye.png";
+        this.assent = "https://g.top4top.io/p_3604cdqyo1.png";
     }
 };
+
