@@ -1,4 +1,5 @@
 const Canvas = require("canvas");
+const axios = require("axios");
 const { formatVariable, applyText } = require("../../utils/functions");
 
 module.exports = class Greeting {
@@ -31,95 +32,118 @@ module.exports = class Greeting {
         this.avatar = value;
         return this;
     }
-    
+
     setGuildIcon(value) {
         this.icon = value;
         return this;
     }
-    
+
     setDiscriminator(value) {
         this.discriminator = value;
         return this;
     }
-    
+
     setUsername(value) {
         this.username = value;
         return this;
     }
-    
+
     setGuildName(value) {
         this.guildName = value;
         return this;
     }
-    
+
     setMemberCount(value) {
         this.memberCount = value;
         return this;
     }
-    
+
     setBackground(value) {
         this.backgroundImage = value;
         return this;
     }
-    
+
     setColor(variable, value) {
         const formattedVariable = formatVariable("color", variable);
         if (this[formattedVariable]) this[formattedVariable] = value;
         return this;
     }
-      
+
     setText(variable, value) {
         const formattedVariable = formatVariable("text", variable);
         if (this[formattedVariable]) this[formattedVariable] = value;
         return this;
     }
-    
+
     setOpacity(variable, value) {
         const formattedVariable = formatVariable("opacity", variable);
         if (this[formattedVariable]) this[formattedVariable] = value;
         return this;
     }
 
+    // helper load image pakai axios
+    async #load(src) {
+        try {
+            if (!src) throw new Error("No image source provided");
+            if (/^https?:\/\//.test(src)) {
+                const res = await axios.get(src, { responseType: "arraybuffer" });
+                return await Canvas.loadImage(Buffer.from(res.data));
+            } else {
+                return await Canvas.loadImage(src);
+            }
+        } catch (e) {
+            console.warn(`⚠️ Gagal load gambar: ${src} (${e.message})`);
+            const c = Canvas.createCanvas(1, 1);
+            const ctx = c.getContext("2d");
+            ctx.fillStyle = "transparent";
+            ctx.fillRect(0, 0, 1, 1);
+            return c;
+        }
+    }
+
     async toAttachment() {
-        // Create canvas
         const canvas = Canvas.createCanvas(1024, 450);
         const ctx = canvas.getContext("2d");
 
-        const guildName = this.textMessage.replace(/{server}/g, this.guildName);
+        const guildName = this.textMessage
+            ? this.textMessage.replace(/{server}/g, this.guildName)
+            : this.guildName;
         const memberCount = this.textMemberCount.replace(/{count}/g, this.memberCount);
 
-        // Draw background
+        // background
         ctx.fillStyle = this.colorBackground;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        let background = await Canvas.loadImage(this.backgroundImage);
+        const background = await this.#load(this.backgroundImage);
         ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-          // img 
-        let b = await Canvas.loadImage(this.assent);
-        ctx.drawImage(b, 0, 0, canvas.width, canvas.height);
+        // overlay image (assent?)
+        if (this.assent) {
+            const b = await this.#load(this.assent);
+            ctx.drawImage(b, 0, 0, canvas.width, canvas.height);
+        }
 
-        // Draw username
+        // username
         ctx.globalAlpha = 1;
         ctx.font = "45px Bold";
-        ctx.textAlign = 'center';
+        ctx.textAlign = "center";
         ctx.fillStyle = this.colorUsername;
         ctx.fillText(this.username, canvas.width - 890, canvas.height - 60);
         const tagLength = ctx.measureText(this.username).width;
-        
-        // Draw membercount
+
+        // membercount
         ctx.fillStyle = this.colorMemberCount;
         ctx.font = "22px Bold";
         ctx.fillText(memberCount, 90, canvas.height - 15);
 
-        // Draw guild name
+        // guild name
         ctx.globalAlpha = 1;
         ctx.font = "45px Bold";
-        ctx.textAlign = 'center';
+        ctx.textAlign = "center";
         ctx.fillStyle = this.colorMessage;
-        let name = guildName.length > 13 ? guildName.substring(0, 10) + "..." : guildName;
+        const name = guildName.length > 13 ? guildName.substring(0, 10) + "..." : guildName;
         ctx.fillText(name, canvas.width - 225, canvas.height - 44);
-        
-        // Draw avatar circle
+
+        // avatar circle
         ctx.save();
         ctx.beginPath();
         ctx.lineWidth = 10;
@@ -128,11 +152,11 @@ module.exports = class Greeting {
         ctx.stroke();
         ctx.closePath();
         ctx.clip();
-        const avatar = await Canvas.loadImage(this.avatar);
+        const avatar = await this.#load(this.avatar);
         ctx.drawImage(avatar, 45, 40, 270, 270);
         ctx.restore();
-         
-        // Draw guild circle
+
+        // guild icon circle
         ctx.save();
         ctx.beginPath();
         ctx.lineWidth = 10;
@@ -141,10 +165,10 @@ module.exports = class Greeting {
         ctx.stroke();
         ctx.closePath();
         ctx.clip();
-        const guildIco = await Canvas.loadImage(this.icon);
+        const guildIco = await this.#load(this.icon);
         ctx.drawImage(guildIco, canvas.width - 230, canvas.height - 280, 160, 160);
         ctx.restore();
-        
+
         return canvas;
     }
 };
